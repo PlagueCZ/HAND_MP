@@ -1,31 +1,61 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <RootNamespace>HAND_MP</RootNamespace>
     <AssemblyName>HAND_MP</AssemblyName>
-    <Description>Have a Nice Death Multiplayer</Description>
-    <Version>1.0.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyTitle>HAND_MP</AssemblyTitle>
+    <Product>HAND_MP</Product>
+    <Description>Local co-op multiplayer for Have A Nice Death.</Description>
+    <Copyright>Copyright © jngo102</Copyright>
+    <AssemblyVersion>0.0.0.1</AssemblyVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
-    <RefsPath>References</RefsPath>
-    <!--GamePath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Have A Nice Death</GamePath>
-    <RefsPath>$(GamePath)/Haveanicedeath_Data/Managed</RefsPath>
-    <Export>C:/HAND/Mods/$(TargetName)</Export-->
   </PropertyGroup>
-  <!--Target Name="CopyMod" AfterTargets="PostBuildEvent">
-    <RemoveDir Directories="$(Export)/$(TargetName)/" />
-    <MakeDir Directories="$(Export)/$(TargetName)/" />
-    <MakeDir Directories="$(Export)/$(TargetName)/zip/" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GamePath)/BepInEx/plugins/" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Export)/$(TargetName)/zip/" />
-    <ZipDirectory SourceDirectory="$(Export)/$(TargetName)/zip/" DestinationFile="$(Export)/$(TargetName)/$(TargetName).zip" />
-    <RemoveDir Directories="$(Export)/$(TargetName)/zip/" />
-
-    <GetFileHash Files="$(Export)/$(TargetName)/$(TargetName).zip" Algorithm="SHA256">
-      <Output TaskParameter="Items" ItemName="FilesWithHashes" />
-    </GetFileHash>
-    <WriteLinesToFile File="$(Export)/$(TargetName)/SHA.txt" Lines="@(FilesWithHashes->'%(FileHash)')" Overwrite="true" Encoding="UTF-8" />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <HANDPath>$(MSBuildProgramFiles32)/Steam/steamapps/common/Have a Nice Death</HANDPath>
+    <!-- Path to mods folder of one installation of Hollow Knight -->
+    <PluginsPath>$(HANDPath)/BepInEx/plugins</PluginsPath>
+    <!-- Path to DLL references required to build mod -->
+    <LocalRefs>$(HANDPath)/Haveanicedeath_Data/Managed</LocalRefs>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <!-- Path to DLL references required to build mod -->
+    <LocalRefs>References</LocalRefs>
+    <!-- The folder that exports will be generated in -->
+    <ExportDir>Output</ExportDir>
+  </PropertyGroup>
+  <Target Condition="'$(Configuration)' == 'Release'" Name="PackageMod" AfterTargets="PostBuildEvent">
+    <RemoveDir Condition="Exists('$(ExportDir)')" Directories="$(ExportDir)" />
+    <MakeDir Directories="$(ExportDir)" />
+    <MakeDir Directories="$(ExportDir)/zip" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ExportDir)" />
+    <ZipDirectory SourceDirectory="$(ExportDir)/zip" DestinationFile="$(ExportDir)/$(TargetName).zip" />
+    <RemoveDir Directories="$(ExportDir)/zip" />
+    <PropertyGroup>
+      <OutputFileString>$(AssemblyVersion)</OutputFileString>
+    </PropertyGroup>
+    <WriteLinesToFile File="Version.txt" Lines="$(OutputFileString)" Overwrite="true" Encoding="UTF-8" />
+  </Target>
+  <Target Condition="'$(Configuration)' == 'Debug'" Name="CopyMod" AfterTargets="PostBuildEvent">
+    <RemoveDir Condition="Exists('$(PluginsPath)/$(TargetName)')" Directories="$(PluginsPath)/$(TargetName)" />
+    <MakeDir Directories="$(PluginsPath)/$(TargetName)" />
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(PluginsPath)/$(TargetName)" />
+    <!-- Uncomment this if you have the game installed on Steam, Steam is in your PATH environment variable, and you want to run the game upon build. -->
     <Exec Command="steam steam://rungameid/1740720" />
-  </Target-->
+  </Target>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
@@ -36,6 +66,9 @@
     </Reference>
     <Reference Include="MagicGameplay">
       <HintPath>$(RefsPath)/MagicGameplay.dll</HintPath>
+    </Reference>
+    <Reference Include="MagicLoading">
+      <HintPath>$(RefsPath)/MagicLoading.dll</HintPath>
     </Reference>
     <Reference Include="MDS.Rewired">
 	    <HintPath>$(RefsPath)/MDS.Rewired.dll</HintPath>

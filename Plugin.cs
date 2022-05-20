@@ -50,7 +50,6 @@ namespace HAND_MP
             _player2Active = false;
 
             var mainCam = GameObject.Find("MainCamera");
-            mainCam.GetComponentsInChildren<Camera>(true).ToList().ForEach(cam => cam.rect = new Rect(0, 0, 1, 1));
             var classicCam = mainCam.GetComponentInChildren<ClassicPlayerCamera>(true);
             var targetControllers = typeof(ClassicPlayerCamera).GetField("targetControllers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(classicCam) as List<UserControllableSimple>;
 
@@ -106,6 +105,7 @@ namespace HAND_MP
             }
 
             _player2 = players[1];
+            _player2.GetComponentInChildren<ClassicHealthManager>(true).ResetLife();
             ctrl = players[1].GetComponentInChildren<PlayerDeathApprenticeControllableController>(true);
             ctrl.PlayerInput.controllers.ClearAllControllers();
             ctrl.PlayerInput.controllers.AddController(controllerType, newControllerId, true);
@@ -156,7 +156,7 @@ namespace HAND_MP
             yield return new WaitUntil(() => GameObject.Find("MainCamera") != null);
 
             var mainCam = GameObject.Find("MainCamera");
-            mainCam.GetComponentsInChildren<Camera>(true).ToList().ForEach(cam => { if (cam.name != "LightCamera") cam.rect = new Rect(0, 0, 0.5f, 1); });
+            mainCam.GetComponentsInChildren<Camera>(true).ToList().ForEach(cam => cam.targetDisplay = 0);
             var classicCam = mainCam.GetComponentInChildren<ClassicPlayerCamera>(true);
             classicCam.GetPlayersInUpdate = false;
             var targetControllers = typeof(ClassicPlayerCamera).GetField("targetControllers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(classicCam) as List<UserControllableSimple>;
@@ -166,9 +166,13 @@ namespace HAND_MP
             var secondaryCam = GameObject.Find("SecondaryCamera");
             if (secondaryCam == null)
             {
+                Display.displays[1].Activate();
+
                 secondaryCam = Instantiate(mainCam, mainCam.transform.parent);
-                secondaryCam.GetComponentsInChildren<Camera>(true).ToList().ForEach(cam => { if (cam.name != "LightCamera") cam.rect = new Rect(0.5f, 0, 0.5f, 1); });
+                secondaryCam.GetComponentsInChildren<Camera>(true).ToList().ForEach(cam => cam.targetDisplay = 1);
+                secondaryCam.transform.Find("GlobalArtSetting").gameObject.SetActive(false);
                 secondaryCam.name = "SecondaryCamera";
+                DontDestroyOnLoad(secondaryCam);
                 Destroy(secondaryCam.GetComponentInChildren<AudioListener>(true));
             }
 
