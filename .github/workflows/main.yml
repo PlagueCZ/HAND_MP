@@ -39,13 +39,17 @@ jobs:
         id: get_version
         run: echo "::set-output name=version::$(cat < Version.txt)"
 
+      - name: Get short commit SHA
+        id: get_sha
+        run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha::7 }}
+          tag_name: ${{ steps.get_sha.outputs.short_sha }}
           release_name: HaND Multiplayer Release v${{ steps.get_version.outputs.version }}
           body: "SHA256: ${{ steps.get_hash.outputs.hash }}"
           draft: false
