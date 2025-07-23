@@ -45,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: ${{ github.sha::7 }}
           release_name: HaND Multiplayer Release v${{ steps.get_version.outputs.version }}
           body: "SHA256: ${{ steps.get_hash.outputs.hash }}"
           draft: false
