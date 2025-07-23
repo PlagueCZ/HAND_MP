@@ -25,6 +25,12 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
+      - name: Package mod into zip
+        run: |
+          mkdir -p Output
+          cp ./bin/Release/HAND_MP.dll Output/
+          zip -j Output/HAND_MP.zip Output/HAND_MP.dll
+
       - name: Get SHA256 of zipped mod
         id: get_hash
         run: echo "::set-output name=hash::$(sha256sum Output/HAND_MP.zip | cut -d ' ' -f 1)"
