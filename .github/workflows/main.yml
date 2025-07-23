@@ -14,12 +14,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       
-      - name: Setup MSBuild
+      - name: Install Mono and NuGet
         run: |
-          sudo apt-get install -y nuget mono-devel mono-xbuild
+          sudo apt-get update
+          sudo apt-get install -y mono-devel
+          wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+          mv nuget.exe /usr/local/bin/nuget.exe
 
       - name: Restore packages
-        run: nuget restore ./HAND_MP.csproj
+        run: mono /usr/local/bin/nuget.exe restore ./HAND_MP.csproj
 
       - name: Build project
         run: dotnet build --configuration Release
