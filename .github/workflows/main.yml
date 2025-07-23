@@ -28,7 +28,7 @@ jobs:
       - name: Package mod into zip
         run: |
           mkdir -p Output
-          cp ./bin/Release/HAND_MP.dll Output/
+          cp ./bin/Release/net46/HAND_MP.dll Output/
           zip -j Output/HAND_MP.zip Output/HAND_MP.dll
 
       - name: Get SHA256 of zipped mod
