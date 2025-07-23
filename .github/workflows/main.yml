@@ -39,17 +39,13 @@ jobs:
         id: get_version
         run: echo "::set-output name=version::$(cat < Version.txt)"
 
-      - name: Get date format for release tag
-        id: get_date
-        run: echo "::set-output name=today::$(date +'%d.%m.%Y')"
-
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_date.outputs.today }}
+          tag_name: ${{ github.sha }}
           release_name: HaND Multiplayer Release v${{ steps.get_version.outputs.version }}
           body: "SHA256: ${{ steps.get_hash.outputs.hash }}"
           draft: false
